@@ -113,7 +113,7 @@ class _MeetingPageState extends State<MeetingPage> {
                   ? const PipView()
                   : Scaffold(
                       backgroundColor: HMSThemeColors.backgroundDim,
-                      resizeToAvoidBottomInset: false,
+                      resizeToAvoidBottomInset: Platform.isAndroid ? true : false,
                       body: SafeArea(
                         child: Theme(
                           data: ThemeData(

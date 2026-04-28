@@ -1,6 +1,8 @@
 ///Package imports
 library;
 
+import 'dart:io';
+
 import 'package:flutter/material.dart';
 
 ///Project imports
@@ -57,7 +59,9 @@ class _EndServiceBottomSheetState extends State<EndServiceBottomSheet> {
   Widget build(BuildContext context) {
     return FractionallySizedBox(
       heightFactor: MediaQuery.of(context).orientation == Orientation.portrait
-          ? 0.25
+          ? Platform.isIOS
+              ? 0.25
+              : 0.28
           : 0.45,
       child: Padding(
         padding: const EdgeInsets.only(top: 16.0, left: 20, right: 20),
@@ -115,6 +119,7 @@ class _EndServiceBottomSheetState extends State<EndServiceBottomSheet> {
                   ),
                 ),
               ),
+              Platform.isAndroid ? const SizedBox(height: 8) : const SizedBox(),
             ],
           ),
         ),
