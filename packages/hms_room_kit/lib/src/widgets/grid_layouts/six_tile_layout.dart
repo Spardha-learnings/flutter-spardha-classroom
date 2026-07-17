@@ -26,75 +26,47 @@ class SixTileLayout extends StatelessWidget {
     required this.startIndex,
   });
 
+  ///Builds a single tile wrapped in an [Expanded].
+  Widget _tile(int index) => Expanded(
+        child: ListenablePeerWidget(
+          index: index,
+          peerTracks: peerTracks,
+        ),
+      );
+
+  ///Builds a row of tiles from the given [indexes].
+  Widget _row(List<int> indexes) => Expanded(
+        child: Row(
+          children: [
+            for (int i = 0; i < indexes.length; i++) ...[
+              if (i != 0) const SizedBox(width: 2),
+              _tile(indexes[i]),
+            ],
+          ],
+        ),
+      );
+
   @override
   Widget build(BuildContext context) {
-    ///Here we render three rows with two tiles in each row
-    ///The first row contains the tiles with index [startIndex] and [startIndex+1]
-    ///The second row contains the tiles with index [startIndex+2] and [startIndex+3]
-    ///The third row contains the tiles with index [startIndex+4] and [startIndex+5]
-    ///The [ListenablePeerWidget] is used to render the tile
+    final bool isLandscape =
+        MediaQuery.of(context).orientation == Orientation.landscape;
+
+    ///In landscape we render two rows of three (3x2). In portrait we keep the
+    ///original three rows of two (2x3).
     return Column(
-      children: [
-        Expanded(
-          child: Row(
-            children: [
-              Expanded(
-                child: ListenablePeerWidget(
-                  index: startIndex,
-                  peerTracks: peerTracks,
-                ),
-              ),
-              const SizedBox(width: 2),
-              Expanded(
-                child: ListenablePeerWidget(
-                  index: startIndex + 1,
-                  peerTracks: peerTracks,
-                ),
-              ),
+      children: isLandscape
+          ? [
+              _row([startIndex, startIndex + 1, startIndex + 2]),
+              const SizedBox(height: 2),
+              _row([startIndex + 3, startIndex + 4, startIndex + 5]),
+            ]
+          : [
+              _row([startIndex, startIndex + 1]),
+              const SizedBox(height: 2),
+              _row([startIndex + 2, startIndex + 3]),
+              const SizedBox(height: 2),
+              _row([startIndex + 4, startIndex + 5]),
             ],
-          ),
-        ),
-        const SizedBox(height: 2),
-        Expanded(
-          child: Row(
-            children: [
-              Expanded(
-                child: ListenablePeerWidget(
-                  index: startIndex + 2,
-                  peerTracks: peerTracks,
-                ),
-              ),
-              const SizedBox(width: 2),
-              Expanded(
-                child: ListenablePeerWidget(
-                  index: startIndex + 3,
-                  peerTracks: peerTracks,
-                ),
-              ),
-            ],
-          ),
-        ),
-        const SizedBox(height: 2),
-        Expanded(
-          child: Row(
-            children: [
-              Expanded(
-                child: ListenablePeerWidget(
-                  index: startIndex + 4,
-                  peerTracks: peerTracks,
-                ),
-              ),
-              const SizedBox(width: 2),
-              Expanded(
-                child: ListenablePeerWidget(
-                  index: startIndex + 5,
-                  peerTracks: peerTracks,
-                ),
-              ),
-            ],
-          ),
-        ),
-      ],
     );
   }
 }

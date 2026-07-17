@@ -26,8 +26,55 @@ class FiveTileLayout extends StatelessWidget {
     required this.startIndex,
   });
 
+  ///Builds a single tile wrapped in an [Expanded].
+  Widget _tile(int index) => Expanded(
+        child: ListenablePeerWidget(
+          index: index,
+          peerTracks: peerTracks,
+        ),
+      );
+
   @override
   Widget build(BuildContext context) {
+    final bool isLandscape =
+        MediaQuery.of(context).orientation == Orientation.landscape;
+
+    ///In landscape we lay the five tiles out as a row of three over a row of
+    ///two, which fills the wide frame far better than the portrait
+    ///2 + 2 + 1 vertical arrangement.
+    if (isLandscape) {
+      return Column(
+        mainAxisAlignment: MainAxisAlignment.center,
+        children: [
+          Expanded(
+            child: Row(
+              children: [
+                _tile(startIndex),
+                const SizedBox(width: 2),
+                _tile(startIndex + 1),
+                const SizedBox(width: 2),
+                _tile(startIndex + 2),
+              ],
+            ),
+          ),
+          const SizedBox(height: 2),
+          Expanded(
+            child: Padding(
+              padding:
+                  EdgeInsets.symmetric(horizontal: MediaQuery.of(context).size.width / 6),
+              child: Row(
+                children: [
+                  _tile(startIndex + 3),
+                  const SizedBox(width: 2),
+                  _tile(startIndex + 4),
+                ],
+              ),
+            ),
+          ),
+        ],
+      );
+    }
+
     ///Here we render two rows with two tiles in each row and last a center tile
     ///The first row contains the tiles with index [startIndex] and [startIndex+1]
     ///The second row contains the tiles with index [startIndex+2] and [startIndex+3]
@@ -38,19 +85,9 @@ class FiveTileLayout extends StatelessWidget {
         Expanded(
           child: Row(
             children: [
-              Expanded(
-                child: ListenablePeerWidget(
-                  index: startIndex,
-                  peerTracks: peerTracks,
-                ),
-              ),
+              _tile(startIndex),
               const SizedBox(width: 2),
-              Expanded(
-                child: ListenablePeerWidget(
-                  index: startIndex + 1,
-                  peerTracks: peerTracks,
-                ),
-              ),
+              _tile(startIndex + 1),
             ],
           ),
         ),
@@ -58,19 +95,9 @@ class FiveTileLayout extends StatelessWidget {
         Expanded(
           child: Row(
             children: [
-              Expanded(
-                child: ListenablePeerWidget(
-                  index: startIndex + 2,
-                  peerTracks: peerTracks,
-                ),
-              ),
+              _tile(startIndex + 2),
               const SizedBox(width: 2),
-              Expanded(
-                child: ListenablePeerWidget(
-                  index: startIndex + 3,
-                  peerTracks: peerTracks,
-                ),
-              ),
+              _tile(startIndex + 3),
             ],
           ),
         ),

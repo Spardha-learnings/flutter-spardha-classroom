@@ -76,6 +76,15 @@ class _OneToOneModeState extends State<OneToOneMode> {
 
   @override
   Widget build(BuildContext context) {
+    ///The inset self-view is a portrait thumbnail (104x186) by default.
+    ///In landscape we swap the dimensions so it becomes a ~16:9 landscape
+    ///thumbnail that matches the camera feed instead of a cropped portrait
+    ///sliver.
+    final bool isLandscape =
+        MediaQuery.of(context).orientation == Orientation.landscape;
+    final double insetWidth = isLandscape ? 186 : 104;
+    final double insetHeight = isLandscape ? 104 : 186;
+
     return Scaffold(
       body: SafeArea(
         child:
@@ -131,6 +140,8 @@ class _OneToOneModeState extends State<OneToOneMode> {
                                   ),
                                   value: oneToOnePeer,
                                   child: InsetTile(
+                                    itemWidth: insetWidth,
+                                    itemHeight: insetHeight,
                                     callbackFunction: toggleMinimizedView,
                                   ),
                                 ),

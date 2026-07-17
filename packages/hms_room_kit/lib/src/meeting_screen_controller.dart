@@ -8,6 +8,7 @@ import 'package:provider/provider.dart';
 
 ///Project imports
 import 'package:hms_room_kit/hms_room_kit.dart';
+import 'package:hms_room_kit/src/common/hms_device_utils.dart';
 import 'package:hms_room_kit/src/hmssdk_interactor.dart';
 import 'package:hms_room_kit/src/widgets/common_widgets/hms_loader.dart';
 import 'package:hms_room_kit/src/hls_viewer/hls_player_store.dart';
@@ -121,15 +122,17 @@ class _MeetingScreenControllerState extends State<MeetingScreenController> {
     _meetingStore.setSettings();
   }
 
-  void setScreenRotation() {
+  ///This function decides whether the screen is allowed to rotate.
+  ///
+  ///Landscape is enabled for:
+  /// - HLS viewers (as before), and
+  /// - interactive conferencing on tablets/iPad.
+  ///
+  ///Phones remain locked to portrait.
+  void setScreenRotation({required bool allowRotation}) {
     WidgetsBinding.instance.addPostFrameCallback((_) {
-      if (HMSRoomLayout
-              .roleLayoutData?.screens?.conferencing?.hlsLiveStreaming !=
-          null) {
-        _meetingStore.allowScreenRotation(true);
-      } else {
-        _meetingStore.allowScreenRotation(false);
-      }
+      if (!mounted) return;
+      _meetingStore.allowScreenRotation(allowRotation);
     });
   }
 
@@ -142,10 +145,16 @@ class _MeetingScreenControllerState extends State<MeetingScreenController> {
             child: Selector<MeetingStore, String?>(
               selector: (_, meetingStore) => meetingStore.localPeer?.role.name,
               builder: (_, data, __) {
-                setScreenRotation();
-                return (HMSRoomLayout.roleLayoutData?.screens?.conferencing
-                            ?.hlsLiveStreaming !=
-                        null)
+                final bool isHLSViewer = HMSRoomLayout.roleLayoutData?.screens
+                        ?.conferencing?.hlsLiveStreaming !=
+                    null;
+
+                ///Allow landscape for HLS viewers (existing behaviour) and for
+                ///interactive conferencing on tablets/iPad. Phones stay portrait.
+                setScreenRotation(
+                  allowRotation: isHLSViewer || HMSDeviceUtils.isTablet(context),
+                );
+                return isHLSViewer
                     ? ListenableProvider.value(
                         value: _hlsPlayerStore,
                         child: const HLSViewerPage(),

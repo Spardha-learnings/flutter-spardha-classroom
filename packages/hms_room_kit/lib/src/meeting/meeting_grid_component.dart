@@ -58,27 +58,40 @@ class MeetingGridComponent extends StatelessWidget {
               selector: (_, meetingNavigationVisibilityController) =>
                   meetingNavigationVisibilityController.showControls,
               builder: (_, showControls, __) {
+                final mediaQuery = MediaQuery.of(context);
+                final bool isLandscape =
+                    mediaQuery.orientation == Orientation.landscape;
+
+                ///Vertical space available to the video grid once the top and
+                ///bottom safe areas are removed.
+                final double availableHeight = mediaQuery.size.height -
+                    mediaQuery.padding.top -
+                    mediaQuery.padding.bottom;
+
+                ///Space reserved for the header + bottom controls so the tiles
+                ///don't hide behind them. In landscape the header/controls are
+                ///relatively shorter, so we reserve less and give the video
+                ///more room.
+                final double controlsReserve = showControls
+                    ? (isLandscape
+                        ? 120
+                        : (Platform.isAndroid
+                            ? 160
+                            : Platform.isIOS
+                                ? 230
+                                : 160))
+                    : 20;
+
                 return Center(
                   child: AnimatedContainer(
                     duration: const Duration(milliseconds: 200),
 
-                    ///If the controls are visible we reduce the
-                    ///height of video grid by 140 else it covers the whole screen
-                    ///
-                    ///Here we also check for the platform and reduce the height accordingly
-                    height: showControls
-                        ? MediaQuery.of(context).size.height -
-                            MediaQuery.of(context).padding.top -
-                            MediaQuery.of(context).padding.bottom -
-                            (Platform.isAndroid
-                                ? 160
-                                : Platform.isIOS
-                                    ? 230
-                                    : 160)
-                        : MediaQuery.of(context).size.height -
-                            MediaQuery.of(context).padding.top -
-                            MediaQuery.of(context).padding.bottom -
-                            20,
+                    ///If the controls are visible we shrink the grid so it sits
+                    ///between the header and the bottom controls, else it nearly
+                    ///covers the whole screen. Clamped so it can never collapse
+                    ///to a negative height on short (landscape) frames.
+                    height: (availableHeight - controlsReserve)
+                        .clamp(1.0, availableHeight),
                     child: GestureDetector(
                       onTap: () =>
                           visibilityController?.toggleControlsVisibility(),

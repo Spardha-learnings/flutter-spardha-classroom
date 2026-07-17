@@ -28,33 +28,36 @@ class ThreeTileLayout extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    ///Here we render three rows with one tile in each row
-    ///The first row contains the tile with index [startIndex]
-    ///The second row contains the tile with index [startIndex+1]
-    ///The third row contains the tile with index [startIndex+2]
-    return Column(
-      children: [
-        Expanded(
-          child: ListenablePeerWidget(
-            index: startIndex,
-            peerTracks: peerTracks,
-          ),
+    ///In portrait the three tiles are stacked vertically (3x1).
+    ///In landscape they sit side by side (1x3) to use the wide frame.
+    final bool isLandscape =
+        MediaQuery.of(context).orientation == Orientation.landscape;
+
+    final children = <Widget>[
+      Expanded(
+        child: ListenablePeerWidget(
+          index: startIndex,
+          peerTracks: peerTracks,
         ),
-        const SizedBox(height: 2),
-        Expanded(
-          child: ListenablePeerWidget(
-            index: startIndex + 1,
-            peerTracks: peerTracks,
-          ),
+      ),
+      const SizedBox(width: 2, height: 2),
+      Expanded(
+        child: ListenablePeerWidget(
+          index: startIndex + 1,
+          peerTracks: peerTracks,
         ),
-        const SizedBox(height: 2),
-        Expanded(
-          child: ListenablePeerWidget(
-            index: startIndex + 2,
-            peerTracks: peerTracks,
-          ),
+      ),
+      const SizedBox(width: 2, height: 2),
+      Expanded(
+        child: ListenablePeerWidget(
+          index: startIndex + 2,
+          peerTracks: peerTracks,
         ),
-      ],
-    );
+      ),
+    ];
+
+    return isLandscape
+        ? Row(children: children)
+        : Column(children: children);
   }
 }

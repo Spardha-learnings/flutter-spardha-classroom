@@ -27,26 +27,36 @@ class TwoTileLayout extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    ///Here we render two rows with one tile in each row
-    ///The first row contains the tile with index [startIndex]
-    ///The second row contains the tile with index [startIndex+1]
-    return Column(
-      mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-      children: [
-        Expanded(
-          child: ListenablePeerWidget(
-            index: startIndex,
-            peerTracks: peerTracks,
-          ),
+    ///In portrait the two tiles are stacked vertically (2x1).
+    ///In landscape they sit side by side (1x2) which uses the wide frame
+    ///far better than a vertical stack.
+    final bool isLandscape =
+        MediaQuery.of(context).orientation == Orientation.landscape;
+
+    final children = <Widget>[
+      Expanded(
+        child: ListenablePeerWidget(
+          index: startIndex,
+          peerTracks: peerTracks,
         ),
-        const SizedBox(height: 2),
-        Expanded(
-          child: ListenablePeerWidget(
-            index: startIndex + 1,
-            peerTracks: peerTracks,
-          ),
+      ),
+      const SizedBox(width: 2, height: 2),
+      Expanded(
+        child: ListenablePeerWidget(
+          index: startIndex + 1,
+          peerTracks: peerTracks,
         ),
-      ],
-    );
+      ),
+    ];
+
+    return isLandscape
+        ? Row(
+            mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+            children: children,
+          )
+        : Column(
+            mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+            children: children,
+          );
   }
 }
