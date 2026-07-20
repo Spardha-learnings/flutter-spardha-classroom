@@ -63,54 +63,53 @@ class _ChatParticipantsTabBarState extends State<ChatParticipantsTabBar>
                 Row(
                   mainAxisAlignment: MainAxisAlignment.spaceBetween,
                   children: [
-                    Row(
-                      mainAxisAlignment: MainAxisAlignment.start,
-                      children: [
-                        Container(
-                          width: MediaQuery.of(context).size.width *
-                              ((HMSRoomLayout.chatData?.realTimeControls
-                                          ?.canDisableChat ??
-                                      false)
-                                  ? 0.69
-                                  : 0.76),
-                          height: 36,
-                          decoration: BoxDecoration(
-                            color: HMSThemeColors.surfaceDefault,
-                            borderRadius: BorderRadius.circular(8),
-                          ),
-                          child: TabBar(
-                            controller: _controller,
-                            tabs: [
-                              Tab(
-                                child: HMSSubheadingText(
-                                  text: HMSRoomLayout.chatData?.chatTitle ??
-                                      "Chat",
-                                  fontWeight: FontWeight.w600,
-                                  textColor: _controller.index == 0
-                                      ? HMSThemeColors.onSurfaceHighEmphasis
-                                      : HMSThemeColors.onSurfaceLowEmphasis,
-                                ),
+                    ///The tab bar flexes to fill the sheet's actual width.
+                    ///We intentionally do NOT size it off MediaQuery width:
+                    ///in landscape the modal sheet is capped/centered (~640pt)
+                    ///while the screen is much wider, so a screen-width
+                    ///fraction would overflow the sheet and push the
+                    ///Participants tab and close button out of bounds.
+                    Expanded(
+                      child: Container(
+                        height: 36,
+                        decoration: BoxDecoration(
+                          color: HMSThemeColors.surfaceDefault,
+                          borderRadius: BorderRadius.circular(8),
+                        ),
+                        child: TabBar(
+                          controller: _controller,
+                          tabs: [
+                            Tab(
+                              child: HMSSubheadingText(
+                                text:
+                                    HMSRoomLayout.chatData?.chatTitle ?? "Chat",
+                                fontWeight: FontWeight.w600,
+                                textColor: _controller.index == 0
+                                    ? HMSThemeColors.onSurfaceHighEmphasis
+                                    : HMSThemeColors.onSurfaceLowEmphasis,
                               ),
-                              Tab(
-                                child: HMSSubheadingText(
-                                  text: "Participants",
-                                  fontWeight: FontWeight.w600,
-                                  textColor: _controller.index == 1
-                                      ? HMSThemeColors.onSurfaceHighEmphasis
-                                      : HMSThemeColors.onSurfaceLowEmphasis,
-                                ),
-                              ),
-                            ],
-                            indicatorPadding: const EdgeInsets.all(4),
-                            indicator: BoxDecoration(
-                              color: HMSThemeColors.surfaceBright,
-                              borderRadius: BorderRadius.circular(4),
                             ),
+                            Tab(
+                              child: HMSSubheadingText(
+                                text: "Participants",
+                                fontWeight: FontWeight.w600,
+                                textColor: _controller.index == 1
+                                    ? HMSThemeColors.onSurfaceHighEmphasis
+                                    : HMSThemeColors.onSurfaceLowEmphasis,
+                              ),
+                            ),
+                          ],
+                          indicatorPadding: const EdgeInsets.all(4),
+                          indicator: BoxDecoration(
+                            color: HMSThemeColors.surfaceBright,
+                            borderRadius: BorderRadius.circular(4),
                           ),
                         ),
-                      ],
+                      ),
                     ),
+                    const SizedBox(width: 8),
                     Row(
+                      mainAxisSize: MainAxisSize.min,
                       mainAxisAlignment: MainAxisAlignment.start,
                       children: [
                         if (HMSRoomLayout
