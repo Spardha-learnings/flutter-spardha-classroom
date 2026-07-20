@@ -9,6 +9,7 @@ import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 
 ///Project imports
+import 'package:hms_room_kit/src/common/hms_device_utils.dart';
 import 'package:hms_room_kit/src/model/peer_track_node.dart';
 import 'package:hms_room_kit/src/widgets/common_widgets/inset_tile.dart';
 import 'package:hms_room_kit/src/widgets/meeting_modes/custom_one_to_one_grid.dart';
@@ -85,6 +86,14 @@ class _OneToOneModeState extends State<OneToOneMode> {
     final double insetWidth = isLandscape ? 186 : 104;
     final double insetHeight = isLandscape ? 104 : 186;
 
+    ///On a tablet, while a screen is being shared, the tiny floating self-view
+    ///is cramped in landscape and overlaps the peer strip in portrait. In that
+    ///case we dock the local peer into the bottom peer strip as a normal tile
+    ///(same size as the other peers, laid out beside them under the shared
+    ///screen) instead of rendering the draggable inset.
+    final bool dockLocalPeer =
+        HMSDeviceUtils.isTablet(context) && widget.screenShareCount > 0;
+
     return Scaffold(
       body: SafeArea(
         child:
@@ -93,7 +102,7 @@ class _OneToOneModeState extends State<OneToOneMode> {
             ///Since we cannot create a draggable widget for single peer.
             ///
             ///This is the case when the local peer is null or it doesn't have audio or videotrack
-            (oneToOnePeer == null)
+            (oneToOnePeer == null || dockLocalPeer)
                 ? CustomOneToOneGrid(
                     isLocalInsetPresent: false,
                     peerTracks: widget.peerTracks,
