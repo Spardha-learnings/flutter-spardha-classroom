@@ -96,14 +96,24 @@ class _MeetingPageState extends State<MeetingPage> {
           if (failureErrors.item1) {
             WidgetsBinding.instance.addPostFrameCallback((_) {
               context.read<MeetingStore>().removeAllBottomSheets();
-              Navigator.of(context).pushReplacement(
-                MaterialPageRoute(
-                  builder: (context) => HMSLeftRoomScreen(
-                    isEndRoomCalled: failureErrors.item3,
-                    doesRoleHasStreamPermission: failureErrors.item4,
+
+              ///Unless the app explicitly asks for the leave screen, we pop the
+              ///prebuilt instead of pushing the "You left the meeting / Rejoin"
+              ///screen, so the user lands straight back on the host app.
+              if (Constant.prebuiltOptions?.showLeaveRoomScreen ?? false) {
+                Navigator.of(context).pushReplacement(
+                  MaterialPageRoute(
+                    builder: (context) => HMSLeftRoomScreen(
+                      isEndRoomCalled: failureErrors.item3,
+                      doesRoleHasStreamPermission: failureErrors.item4,
+                    ),
                   ),
-                ),
-              );
+                );
+              } else {
+                ///Same cleanup the leave screen does on its close button
+                HMSThemeColors.resetLayoutColors();
+                Navigator.of(context).pop();
+              }
             });
           }
           return Selector<MeetingStore, bool>(

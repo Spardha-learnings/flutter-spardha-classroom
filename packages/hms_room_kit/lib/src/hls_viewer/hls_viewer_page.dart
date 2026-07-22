@@ -17,6 +17,7 @@ import 'package:hms_room_kit/src/widgets/app_dialogs/audio_device_change_dialog.
 import 'package:hms_room_kit/src/widgets/common_widgets/hms_left_room_screen.dart';
 import 'package:hms_room_kit/src/widgets/toasts/hms_toast_model.dart';
 import 'package:hms_room_kit/src/layout_api/hms_theme_colors.dart';
+import 'package:hms_room_kit/src/common/constants.dart';
 import 'package:hms_room_kit/src/preview_for_role/preview_for_role_bottom_sheet.dart';
 import 'package:hms_room_kit/src/preview_for_role/preview_for_role_header.dart';
 import 'package:hms_room_kit/src/widgets/common_widgets/hms_circular_avatar.dart';
@@ -92,14 +93,23 @@ class _HLSViewerPageState extends State<HLSViewerPage> {
         builder: (_, failureData, __) {
           if (failureData.item1) {
             WidgetsBinding.instance.addPostFrameCallback((_) {
-              Navigator.of(context).pushReplacement(
-                MaterialPageRoute(
-                  builder: (context) => HMSLeftRoomScreen(
-                    isEndRoomCalled: failureData.item3,
-                    doesRoleHasStreamPermission: failureData.item4,
+              ///Unless the app explicitly asks for the leave screen, we pop the
+              ///prebuilt instead of pushing the "You left the stream / Rejoin"
+              ///screen, so the user lands straight back on the host app.
+              if (Constant.prebuiltOptions?.showLeaveRoomScreen ?? false) {
+                Navigator.of(context).pushReplacement(
+                  MaterialPageRoute(
+                    builder: (context) => HMSLeftRoomScreen(
+                      isEndRoomCalled: failureData.item3,
+                      doesRoleHasStreamPermission: failureData.item4,
+                    ),
                   ),
-                ),
-              );
+                );
+              } else {
+                ///Same cleanup the leave screen does on its close button
+                HMSThemeColors.resetLayoutColors();
+                Navigator.of(context).pop();
+              }
             });
           }
           return Selector<MeetingStore, bool>(

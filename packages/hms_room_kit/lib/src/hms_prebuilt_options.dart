@@ -41,6 +41,13 @@ class HMSPrebuiltOptions {
   ///Default value is false
   final bool isNoiseSuppressionEnabled;
 
+  ///Whether to show the "You left the meeting / Rejoin" screen after leaving.
+  ///
+  ///Default value is false: on leave the prebuilt route is simply popped so
+  ///the user lands back on the host app instead of an intermediate rejoin
+  ///screen. Set this to true to get the stock 100ms leave screen back.
+  final bool showLeaveRoomScreen;
+
   ///[HMSPrebuiltOptions] is a class that is used to pass the options to the prebuilt
   HMSPrebuiltOptions({
     this.userName,
@@ -51,5 +58,6 @@ class HMSPrebuiltOptions {
     this.enableNoiseCancellation = false,
     this.isAutomaticGainControlEnabled = true,
     this.isNoiseSuppressionEnabled = false,
+    this.showLeaveRoomScreen = false,
   });
 }
