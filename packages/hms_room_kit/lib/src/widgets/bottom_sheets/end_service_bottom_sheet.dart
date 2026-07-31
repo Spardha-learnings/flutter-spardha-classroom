@@ -57,73 +57,78 @@ class _EndServiceBottomSheetState extends State<EndServiceBottomSheet> {
 
   @override
   Widget build(BuildContext context) {
-    return FractionallySizedBox(
-      heightFactor: MediaQuery.of(context).orientation == Orientation.portrait
-          ? Platform.isIOS
-              ? 0.25
-              : 0.28
-          : 0.45,
-      child: Padding(
-        padding: const EdgeInsets.only(top: 16.0, left: 20, right: 20),
-        child: SingleChildScrollView(
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              Row(
-                mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                children: [
-                  Row(
-                    children: [
-                      widget.bottomSheetTitleIcon ?? const SizedBox(),
-                      const SizedBox(width: 8),
-                      widget.title ?? const SizedBox(),
-                    ],
-                  ),
-                  const Row(
-                    mainAxisAlignment: MainAxisAlignment.end,
-                    children: [HMSCrossButton()],
-                  ),
-                ],
-              ),
-              const SizedBox(height: 8),
-              widget.subTitle ?? const SizedBox(),
-              const SizedBox(height: 16),
-              ElevatedButton(
-                style: ButtonStyle(
-                  shadowColor: WidgetStateProperty.all(
-                    HMSThemeColors.surfaceDim,
-                  ),
-                  backgroundColor: WidgetStateProperty.all(
-                    widget.buttonColor ?? HMSThemeColors.alertErrorDefault,
-                  ),
-                  shape: WidgetStateProperty.all<RoundedRectangleBorder>(
-                    RoundedRectangleBorder(
-                      borderRadius: BorderRadius.circular(8.0),
-                    ),
-                  ),
+    final content = Padding(
+      padding: const EdgeInsets.only(top: 16.0, left: 20, right: 20),
+      child: SingleChildScrollView(
+        child: Column(
+          mainAxisSize: MainAxisSize.min,
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Row(
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              children: [
+                Row(
+                  children: [
+                    widget.bottomSheetTitleIcon ?? const SizedBox(),
+                    const SizedBox(width: 8),
+                    widget.title ?? const SizedBox(),
+                  ],
                 ),
-                onPressed: () {
-                  if (widget.onButtonPressed != null) {
-                    widget.onButtonPressed!();
-                  }
-                  context.read<MeetingStore>().removeBottomSheet(context);
-                  Navigator.pop(context);
-                },
-                child: SizedBox(
-                  height: 48,
-                  child: Center(
-                    child: HMSTitleText(
-                      text: widget.buttonText ?? "",
-                      textColor: HMSThemeColors.alertErrorBrighter,
-                    ),
+                const Row(
+                  mainAxisAlignment: MainAxisAlignment.end,
+                  children: [HMSCrossButton()],
+                ),
+              ],
+            ),
+            const SizedBox(height: 8),
+            widget.subTitle ?? const SizedBox(),
+            const SizedBox(height: 16),
+            ElevatedButton(
+              style: ButtonStyle(
+                shadowColor: WidgetStateProperty.all(
+                  HMSThemeColors.surfaceDim,
+                ),
+                backgroundColor: WidgetStateProperty.all(
+                  widget.buttonColor ?? HMSThemeColors.alertErrorDefault,
+                ),
+                shape: WidgetStateProperty.all<RoundedRectangleBorder>(
+                  RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(8.0),
                   ),
                 ),
               ),
-              Platform.isAndroid ? const SizedBox(height: 8) : const SizedBox(),
-            ],
-          ),
+              onPressed: () {
+                if (widget.onButtonPressed != null) {
+                  widget.onButtonPressed!();
+                }
+                context.read<MeetingStore>().removeBottomSheet(context);
+                Navigator.pop(context);
+              },
+              child: SizedBox(
+                height: 48,
+                child: Center(
+                  child: HMSTitleText(
+                    text: widget.buttonText ?? "",
+                    textColor: HMSThemeColors.alertErrorBrighter,
+                  ),
+                ),
+              ),
+            ),
+            Platform.isAndroid ? const SizedBox(height: 8) : const SizedBox(),
+          ],
         ),
       ),
+    );
+
+    ///In landscape the screen is short, so a fixed height fraction leaves a
+    ///large empty gap under the button. Let the sheet hug its content instead.
+    if (MediaQuery.of(context).orientation == Orientation.landscape) {
+      return content;
+    }
+
+    return FractionallySizedBox(
+      heightFactor: Platform.isIOS ? 0.25 : 0.28,
+      child: content,
     );
   }
 }
