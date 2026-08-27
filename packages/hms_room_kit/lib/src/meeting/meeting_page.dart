@@ -50,6 +50,13 @@ class MeetingPage extends StatefulWidget {
 class _MeetingPageState extends State<MeetingPage> {
   MeetingNavigationVisibilityController? _visibilityController;
 
+  ///Guards the room-ended navigation below so it only runs once.
+  ///[isRoomEnded] stays true across further rebuilds of this [Selector],
+  ///and without this flag each rebuild schedules another post-frame
+  ///pushReplacement/pop, and the second one crashes with "Bad state: No
+  ///element" once the first has already removed this route.
+  bool _hasHandledRoomEnded = false;
+
   @override
   void initState() {
     super.initState();
@@ -93,7 +100,8 @@ class _MeetingPageState extends State<MeetingPage> {
           meetingStore.localPeer?.role.permissions.hlsStreaming ?? false,
         ),
         builder: (_, failureErrors, __) {
-          if (failureErrors.item1) {
+          if (failureErrors.item1 && !_hasHandledRoomEnded) {
+            _hasHandledRoomEnded = true;
             WidgetsBinding.instance.addPostFrameCallback((_) {
               context.read<MeetingStore>().removeAllBottomSheets();
 
