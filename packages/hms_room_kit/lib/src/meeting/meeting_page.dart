@@ -120,7 +120,16 @@ class _MeetingPageState extends State<MeetingPage> {
               } else {
                 ///Same cleanup the leave screen does on its close button
                 HMSThemeColors.resetLayoutColors();
-                Navigator.of(context).pop();
+                ///Host apps (e.g. Spardha's HmsPrebuiltWrapper) may embed this
+                ///page as the only route in an isolated Navigator, so there is
+                ///nothing beneath it to return to. Popping unconditionally in
+                ///that case throws "Bad state: No element" from Navigator.pop's
+                ///internal route lookup. Guard with canPop(); when there's
+                ///nothing to pop, the host's own onLeave handling is
+                ///responsible for exiting (see CUSTOMER-MOBILE-APP-A3).
+                if (Navigator.of(context).canPop()) {
+                  Navigator.of(context).pop();
+                }
               }
             });
           }
